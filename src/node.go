@@ -6,18 +6,26 @@ import (
 
 type ACNode struct {
 	root bool
-	symbol int
-	output *vector.Vector
+	symbol uint8
+	output BitArray
 	fail *ACNode
 	children *vector.Vector
 }
 
-func NewACNode(symbol int) (*ACNode) {
-	return &ACNode{false, symbol, new(vector.Vector), nil, new(vector.Vector)}
+func NewACNode(symbol uint8, outputSize int) (*ACNode) {
+	return &ACNode{false,
+		symbol,
+		NewBitArray(outputSize),
+		nil,
+		new(vector.Vector)}
 }
 
-func NewRootACNode() (*ACNode) {
-	return &ACNode{true, -1, new(vector.Vector), nil, new(vector.Vector)}
+func NewRootACNode(outputSize int) (*ACNode) {
+	return &ACNode{true,
+		0,
+		NewBitArray(outputSize),
+		nil,
+		new(vector.Vector)}
 }
 
 func (node *ACNode) isRoot() (bool) {
@@ -28,7 +36,7 @@ func (node *ACNode) isRoot() (bool) {
 the index of the next biggest symbol in the vector. Take note, this
 index might be outside of the vector!*/
 
-func binarySearch(vec *vector.Vector, left int, right int, symbol int) (int, bool) {
+func binarySearch(vec *vector.Vector, left int, right int, symbol uint8) (int, bool) {
 	if left > right {
 		return left, false
 	}
@@ -58,7 +66,7 @@ func (node *ACNode) AddChild(child *ACNode) {
 	}
 }
 
-func (node *ACNode) LookupChild(symbol int) (*ACNode, bool) {
+func (node *ACNode) LookupChild(symbol uint8) (*ACNode, bool) {
 	i, found := binarySearch(node.children,
 		0,
 		node.children.Len() - 1,
@@ -72,4 +80,14 @@ func (node *ACNode) LookupChild(symbol int) (*ACNode, bool) {
 	}
 	return node.children.At(i).(*ACNode), true
 
+}
+
+func (node *ACNode) Push(symbol uint8) (*ACNode) {
+	_, found := node.LookupChild(symbol)
+	for !found {
+		node = node.fail
+		_, found = node.LookupChild(symbol)
+	}
+	node, _ = node.LookupChild(symbol)
+	return node
 }
