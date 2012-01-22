@@ -1,9 +1,10 @@
 package main
 
-import "utf8"
+import (
+"utf8"
+)
 
-type State int
-
+/*
 func updateGoto(g map[State](map[int]State),
 state State,
 symbol int,
@@ -14,7 +15,38 @@ newstate State) {
 	}
 	g[state][symbol] = newstate
 }
+*/
+func MakeLinkedGoto(keywords []*utf8.String) (*ACNode) {
+	root := NewACNode(-1)
+	//root.fail = root
 
+	for i, keyword := range keywords {
+		kwLen := keyword.RuneCount()
+		if kwLen < 1 {
+			continue
+		}
+
+		state := root
+		j := 0
+		nextState, found := state.LookupChild(keyword.At(j));
+		for found {
+			state = nextState
+			j++
+			nextState, found = state.LookupChild(keyword.At(j));
+		}
+
+		for p := j; p < kwLen; p++ {
+			newstate := NewACNode(keyword.At(p))
+			state.AddChild(newstate)
+			state = newstate
+		}
+
+		state.output.Push(i)
+	}
+
+	return root
+}
+/*
 func MakeGoto(keywords []*utf8.String) (func(State, int) (State, bool),
 	                                func(State) ([]*utf8.String, bool)) {
 	g := make(map[State]map[int]State)
@@ -62,3 +94,4 @@ func MakeGoto(keywords []*utf8.String) (func(State, int) (State, bool),
 		return s, true
 	}
 }
+*/
