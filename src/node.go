@@ -5,6 +5,7 @@ import (
 )
 
 type ACNode struct {
+	root bool
 	symbol int
 	output *vector.Vector
 	fail *ACNode
@@ -12,7 +13,15 @@ type ACNode struct {
 }
 
 func NewACNode(symbol int) (*ACNode) {
-	return &ACNode{symbol, new(vector.Vector), nil, new(vector.Vector)}
+	return &ACNode{false, symbol, new(vector.Vector), nil, new(vector.Vector)}
+}
+
+func NewRootACNode() (*ACNode) {
+	return &ACNode{true, -1, new(vector.Vector), nil, new(vector.Vector)}
+}
+
+func (node *ACNode) isRoot() (bool) {
+	return node.root
 }
 
 /*Standard binary search. If symbol is not found, returns false and
@@ -56,12 +65,11 @@ func (node *ACNode) LookupChild(symbol int) (*ACNode, bool) {
 		symbol)
 
 	if !found {
-		if node.symbol == -1 {
+		if node.isRoot() {
 			return node, true
 		}
 		return nil, false
 	}
-	
 	return node.children.At(i).(*ACNode), true
 
 }

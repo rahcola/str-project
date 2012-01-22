@@ -14,22 +14,19 @@ func MakeLinkedFail(root *ACNode) {
 
 	for queue.Len() > 0 {
 		r := queue.Remove(queue.Front()).(*ACNode)
-		for _, child := range *r.children {
-			child := child.(*ACNode)
-			queue.PushBack(child)
+		for _, s := range *r.children {
+			s := s.(*ACNode)
+			queue.PushBack(s)
 
 			state := r.fail
-			_, found := state.LookupChild(child.symbol)
-			for !found && state != root {
+			_, found := state.LookupChild(s.symbol)
+			for !found {
 				state = state.fail
-				_, found = state.LookupChild(child.symbol)
+				_, found = state.LookupChild(s.symbol)
 			}
 
-			child.fail, _ = state.LookupChild(child.symbol)
-			if child.fail == nil {
-				child.fail = root
-			}
-			child.output.AppendVector(child.fail.output)
+			s.fail, _ = state.LookupChild(s.symbol)
+			s.output.AppendVector(s.fail.output)
 		}
 	}
 }
