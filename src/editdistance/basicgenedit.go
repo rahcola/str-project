@@ -16,6 +16,9 @@ func MakeBasicGenEdit(G [][]string, c []float64) (func(string, string) float64) 
 
 	minCost := func(A string, B string, d [][]float64) float64 {
 		min := math.Inf(1)
+		if len(A) > 0 && len(B) > 0 && A[len(A)-1] == B[len(B)-1] {
+			min = d[len(B)-1][len(A)-1]
+		}
 		for pi, _ := range G {
 			min = math.Fmin(min, cost(A, B, pi, d))
 		}

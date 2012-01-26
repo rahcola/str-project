@@ -16,6 +16,9 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 	Bstate *ACNode,
 	d [][]float64) float64 {
 		min := math.Inf(1)
+		if len(A) > 0 && len(B) > 0 && Astate.symbol == Bstate.symbol {
+			min = d[len(B)-1][len(A)-1]
+		}
 		p := Astate.output.Intersection(Bstate.output)
 		p.ForEach(func(i int) {
 			a := len(A) - len(G[0][i])
