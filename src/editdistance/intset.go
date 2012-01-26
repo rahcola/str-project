@@ -1,34 +1,29 @@
 package editdistance
 
-type BitArray struct {
-	size int
-	arr []uint32
-}
+type BitArray []uint32
 
 func NewBitArray(size int) BitArray {
 	s := size / 32
 	if s * 32 < size {
 		s++
 	}
-	return BitArray{size, make([]uint32, s)}
+	return make([]uint32, 0, s)
 }
 
-func (a BitArray) Len() int {
-	return a.size
-}
-
-func (a BitArray) Set(i int) {
-	if i < a.Len() {
-		a.arr[i / 32] = a.arr[i / 32] | (1 << uint(i % 32))
+func (a BitArray) Set(i int) BitArray {
+	for i >= len(a) * 32 {
+		a = append(a, 0)
 	}
+	a[i / 32] = a[i / 32] | (1 << uint(i % 32))
+	return a
 }
 
 func (a BitArray) ForEach(do func(int)) {
 	index := 0
-	for i := 0; i < len(a.arr); i++ {
-		word := a.arr[i]
+	for i := 0; i < len(a); i++ {
+		word := a[i]
 		for k := 0; k < 32; k++ {
-			if word & 1 != 0 && index < a.Len() {
+			if word & 1 != 0 {
 				do(index)
 			}
 			word = word >> 1
@@ -38,17 +33,31 @@ func (a BitArray) ForEach(do func(int)) {
 }
 
 func (a BitArray) Union(b BitArray) BitArray {
-	r := NewBitArray(a.Len())
-	for i := 0; i < len(r.arr); i++ {
-		r.arr[i] = a.arr[i] | b.arr[i]
+	l := len(a)
+	if len(b) > l {
+		l = len(b)
+	}
+	r := make([]uint32, l)
+	for i := 0 ; i < len(r); i++ {
+		if i >= len(a) {
+			r[i] = b[i]
+		} else if i >= len(b) {
+			r[i] = a[i]
+		} else {
+			r[i] = a[i] | b[i]
+		}
 	}
 	return r
 }
 
 func (a BitArray) Intersection(b BitArray) BitArray {
-	r := NewBitArray(a.Len())
-	for i := 0; i < len(r.arr); i++ {
-		r.arr[i] = a.arr[i] & b.arr[i]
+	l := len(a)
+	if len(b) < l {
+		l = len(b)
+	}
+	r := make([]uint32, l)
+	for i := 0; i < len(r); i++ {
+		r[i] = a[i] & b[i]
 	}
 	return r
 }
