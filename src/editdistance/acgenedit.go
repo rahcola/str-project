@@ -19,7 +19,7 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 		if len(A) > 0 && len(B) > 0 && Astate.symbol == Bstate.symbol {
 			min = d[len(B)-1][len(A)-1]
 		}
-		p := Astate.output.Intersection(Bstate.output)
+		p := Astate.Output().Intersection(Bstate.Output())
 		p.ForEach(func(i int) {
 			a := len(A) - len(G[0][i])
 			b := len(B) - len(G[1][i])
@@ -55,7 +55,6 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 				Astate = Astate.Push(A[x])
 			}
 		}
-
 		return d[len(B)][len(A)]
 	}
 }

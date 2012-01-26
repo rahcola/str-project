@@ -5,7 +5,7 @@ import (
 )
 
 func MakeLinkedGoto(keywords []string) (*ACNode) {
-	tmpRoot := NewACNode(0, len(keywords))
+	tmpRoot := NewACNode(0)
 
 	for i, keyword := range keywords {
 		state := tmpRoot
@@ -15,15 +15,15 @@ func MakeLinkedGoto(keywords []string) (*ACNode) {
 			if found {
 				state = nextState
 			} else {
-				newstate := NewACNode(symbol, len(keywords))
+				newstate := NewACNode(symbol)
 				state.AddChild(newstate)
 				state = newstate
 			}
 		}
-		state.output.Set(i)
+		state.rep = state.rep.Set(i)
 	}
 
-	root := NewRootACNode(len(keywords))
+	root := NewRootACNode()
 	root.children = tmpRoot.children
 	return root
 }

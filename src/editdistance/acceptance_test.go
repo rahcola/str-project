@@ -4,6 +4,47 @@ import (
 	"testing"
 )
 
+func TestZero(t *testing.T) {
+	root := MakeLinkedGoto([]string{"she", "he", "his", "hers"})
+	MakeLinkedFail(root)
+
+	o := make([]bool, 4)
+	ac := root.Push('h').Push('e')
+	ac.Output().ForEach(func(i int) {
+		o[i] = true
+	})
+	if !o[1] {
+		t.Error("Output for 'he' wrong: ", o)
+	}
+
+	o = make([]bool, 4)
+	ac = root.Push('h').Push('e').Push('r').Push('s')
+	ac.Output().ForEach(func(i int) {
+		o[i] = true
+	})
+	if !o[3] {
+		t.Error("Output for 'hers' wrong: ", o)
+	}
+
+	o = make([]bool, 4)
+	ac = root.Push('h').Push('i').Push('s')
+	ac.Output().ForEach(func(i int) {
+		o[i] = true
+	})
+	if !o[2] {
+		t.Error("Output for 'his' wrong: ", o)
+	}
+
+	o = make([]bool, 4)
+	ac = root.Push('s').Push('h').Push('e')
+	ac.Output().ForEach(func(i int) {
+		o[i] = true
+	})
+	if !(o[0] && o[1]) {
+		t.Error("Output for 'she' wrong: ", o)
+	}
+}
+
 func TestOne(t *testing.T) {
 	A := "abcabc"
 	B := "cdcd"

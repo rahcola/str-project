@@ -7,28 +7,28 @@ import (
 type ACNode struct {
 	root bool
 	symbol uint8
-	output BitArray
+	rep BitArray
 	fail *ACNode
 	children *vector.Vector
 }
 
-func NewACNode(symbol uint8, outputSize int) (*ACNode) {
+func NewACNode(symbol uint8) (*ACNode) {
 	return &ACNode{false,
 		symbol,
-		NewBitArray(outputSize),
+		NewBitArray(1),
 		nil,
 		new(vector.Vector)}
 }
 
-func NewRootACNode(outputSize int) (*ACNode) {
+func NewRootACNode() (*ACNode) {
 	return &ACNode{true,
 		0,
-		NewBitArray(outputSize),
+		NewBitArray(1),
 		nil,
 		new(vector.Vector)}
 }
 
-func (node *ACNode) isRoot() (bool) {
+func (node *ACNode) IsRoot() (bool) {
 	return node.root
 }
 
@@ -53,11 +53,25 @@ func binarySearch(vec *vector.Vector, left int, right int, symbol uint8) (int, b
 	return mid, true
 }
 
+func (node *ACNode) Output() BitArray {
+	r := NewBitArray(32)
+	r = r.Union(node.rep)
+	s := node.fail
+	for s != nil {
+		r = r.Union(s.rep)
+		s = s.fail
+	}
+	return r
+}
+
 func (node *ACNode) AddChild(child *ACNode) {
 	i, _ := binarySearch(node.children,
 		0,
 		node.children.Len() - 1,
-		child.symbol)
+	
+
+
+	child.symbol)
 
 	if i >= node.children.Len() {
 		node.children.Push(child)
@@ -73,7 +87,7 @@ func (node *ACNode) LookupChild(symbol uint8) (*ACNode, bool) {
 		symbol)
 
 	if !found {
-		if node.isRoot() {
+		if node.IsRoot() {
 			return node, true
 		}
 		return nil, false
