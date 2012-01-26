@@ -12,6 +12,6 @@ func main() {
 	g2 := [][]string{{"abc", "ab", "ca", "bc"}, {"cd", "c", "d", "cd"}}
 	c := []float64{2, 1, 1, 1}
 
-	fmt.Println(MakeBasicGenEdit(g1, c)(A, B))
-	fmt.Println(MakeACGenEdit(g2, c)(A, B))
+	fmt.Println(editdistance.MakeBasicGenEdit(g1, c)(A, B))
+	fmt.Println(editdistance.MakeACGenEdit(g2, c)(A, B))
 }
