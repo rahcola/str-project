@@ -10,7 +10,7 @@ func TestZero(t *testing.T) {
 
 	o := make([]bool, 4)
 	ac := root.Push('h').Push('e')
-	ac.Output().ForEach(func(i int) {
+	ac.output.ForEach(func(i int) {
 		o[i] = true
 	})
 	if !o[1] {
@@ -19,7 +19,7 @@ func TestZero(t *testing.T) {
 
 	o = make([]bool, 4)
 	ac = root.Push('h').Push('e').Push('r').Push('s')
-	ac.Output().ForEach(func(i int) {
+	ac.output.ForEach(func(i int) {
 		o[i] = true
 	})
 	if !o[3] {
@@ -28,7 +28,7 @@ func TestZero(t *testing.T) {
 
 	o = make([]bool, 4)
 	ac = root.Push('h').Push('i').Push('s')
-	ac.Output().ForEach(func(i int) {
+	ac.output.ForEach(func(i int) {
 		o[i] = true
 	})
 	if !o[2] {
@@ -37,7 +37,7 @@ func TestZero(t *testing.T) {
 
 	o = make([]bool, 4)
 	ac = root.Push('s').Push('h').Push('e')
-	ac.Output().ForEach(func(i int) {
+	ac.output.ForEach(func(i int) {
 		o[i] = true
 	})
 	if !(o[0] && o[1]) {

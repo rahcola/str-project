@@ -20,7 +20,7 @@ func MakeLinkedGoto(keywords []string) (*ACNode) {
 				state = newstate
 			}
 		}
-		state.output.Set(i)
+		state.output = state.output.Set(i)
 	}
 
 	root := NewRootACNode(len(keywords))
