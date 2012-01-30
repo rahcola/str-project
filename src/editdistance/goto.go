@@ -10,7 +10,6 @@ func MakeLinkedGoto(keywords []string) (*ACNode) {
 	for i, keyword := range keywords {
 		state := tmpRoot
 		for _, symbol := range keyword {
-			symbol := uint8(symbol)
 			nextState, found := state.LookupChild(symbol)
 			if found {
 				state = nextState

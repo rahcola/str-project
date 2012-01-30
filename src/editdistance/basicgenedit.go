@@ -2,6 +2,7 @@ package editdistance
 
 import (
 	"math"
+	"utf8"
 )
 
 func MakeBasicGenEdit(G [][]string, c []float64) (func(string, string) float64) {
@@ -25,19 +26,21 @@ func MakeBasicGenEdit(G [][]string, c []float64) (func(string, string) float64) 
 		return min
 	}
 
-	return func(A string, B string) float64 {
-		d := makeMatrix(len(B)+1, len(A)+1)
+	return func(Ap string, Bp string) float64 {
+		A := utf8.NewString(Ap)
+		B := utf8.NewString(Bp)
+		d := makeMatrix(B.RuneCount()+1, A.RuneCount()+1)
 
-		for x := 0; x <= len(A); x++ {
-			for y := 0; y <= len(B); y++ {
+		for x := 0; x <= A.RuneCount(); x++ {
+			for y := 0; y <= B.RuneCount(); y++ {
 				if x == 0 && y == 0 {
 					d[y][x] = 0
 				} else {
-					d[y][x] = minCost(A[:x], B[:y], d)
+					d[y][x] = minCost(A.Slice(0, x), B.Slice(0, y), d)
 				}
 			}
 		}
 
-		return d[len(B)][len(A)]
+		return d[B.RuneCount()][A.RuneCount()]
 	}
 }
