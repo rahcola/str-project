@@ -1,15 +1,29 @@
 package editdistance
 
 import (
-	"container/vector"
+	"sort"
 )
+
+type Children []*ACNode
+
+func (c Children) Len() int {
+	return len(c)
+}
+
+func (c Children) Less(i int, j int) bool {
+	return c[i].symbol < c[j].symbol
+}
+
+func (c Children) Swap(i int, j int) {
+	c[i], c[j] = c[j], c[i]
+}
 
 type ACNode struct {
 	root bool
 	symbol int
 	output BitArray
 	fail *ACNode
-	children *vector.Vector
+	children Children
 }
 
 func NewACNode(symbol int, outputSize int) (*ACNode) {
@@ -17,7 +31,7 @@ func NewACNode(symbol int, outputSize int) (*ACNode) {
 		symbol,
 		NewBitArray(outputSize),
 		nil,
-		new(vector.Vector)}
+		make([]*ACNode, 0, 1)}
 }
 
 func NewRootACNode(outputSize int) (*ACNode) {
@@ -25,60 +39,46 @@ func NewRootACNode(outputSize int) (*ACNode) {
 		0,
 		NewBitArray(outputSize),
 		nil,
-		new(vector.Vector)}
+		make([]*ACNode, 0, 1)}
 }
 
-func (node *ACNode) isRoot() (bool) {
+func (node ACNode) isRoot() (bool) {
 	return node.root
 }
 
-/*Standard binary search. If symbol is not found, returns false and
-the index of the next biggest symbol in the vector. Take note, this
-index might be outside of the vector!*/
+func BinarySearch(arr Children, symbol int) (*ACNode, bool) {
+	low := 0
+	high := len(arr) - 1
 
-func binarySearch(vec *vector.Vector, left int, right int, symbol int) (int, bool) {
-	if left > right {
-		return left, false
+	for low <= high {
+		mid := (low + high) / 2
+		val := arr[mid].symbol
+		if val > symbol {
+			high = mid - 1
+		} else	if val < symbol {
+			low = mid + 1
+		} else {
+			return arr[mid], true
+		}
 	}
-
-	mid := (right - left) / 2 + left
-	val := vec.At(mid).(*ACNode).symbol
-
-	if val > symbol {
-		return binarySearch(vec, left, mid - 1, symbol)
-	}
-	if val < symbol {
-		return binarySearch(vec, mid + 1, right, symbol)
-	}
-	return mid, true
+	return nil, false
 }
 
 func (node *ACNode) AddChild(child *ACNode) {
-	i, _ := binarySearch(node.children,
-		0,
-		node.children.Len() - 1,
-		child.symbol)
-
-	if i >= node.children.Len() {
-		node.children.Push(child)
-	} else {
-		node.children.Insert(i, child)
-	}
+	node.children = append(node.children, child)
+	sort.Sort(node.children)
 }
 
 func (node *ACNode) LookupChild(symbol int) (*ACNode, bool) {
-	i, found := binarySearch(node.children,
-		0,
-		node.children.Len() - 1,
-		symbol)
+	child, found := BinarySearch(node.children, symbol)
 
 	if !found {
-		if node.isRoot() {
+		if node.root {
 			return node, true
 		}
 		return nil, false
 	}
-	return node.children.At(i).(*ACNode), true
+	return child, true
 
 }
 
