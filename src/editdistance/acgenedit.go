@@ -10,24 +10,6 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 	Broot := MakeLinkedGoto(G[1])
 	MakeLinkedFail(Broot)
 
-	minCost := func(A string,
-	Astate *ACNode,
-	B string,
-	Bstate *ACNode,
-	d [][]float64) float64 {
-		min := math.Inf(1)
-		if len(A) > 0 && len(B) > 0 && Astate.symbol == Bstate.symbol {
-			min = d[len(B)-1][len(A)-1]
-		}
-		p := Astate.output.Intersection(Bstate.output)
-		p.ForEach(func(i int) {
-			a := len(A) - len(G[0][i])
-			b := len(B) - len(G[1][i])
-			min = math.Fmin(min, d[b][a]+c[i])
-		})
-		return min
-	}
-
 	return func(A string, B string) float64 {
 		d := makeMatrix(len(B)+1, len(A)+1)
 
@@ -40,11 +22,17 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 				if x == 0 && y == 0 {
 					d[y][x] = 0
 				} else {
-					d[y][x] = minCost(A[:x],
-						Astate,
-						B[:y],
-						Bstate,
-						d)
+					min := math.Inf(1)
+					if x > 0 && y > 0 && Astate.symbol == Bstate.symbol {
+						min = d[y-1][x-1]
+					}
+					p := Astate.output.Intersection(Bstate.output)
+					p.ForEach(func(i int) {
+						a := x - len(G[0][i])
+						b := y - len(G[1][i])
+						min = math.Fmin(min, d[b][a]+c[i])
+					})
+					d[y][x] = min
 				}
 
 				if y < len(B) {
