@@ -66,7 +66,7 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 			}
 
 			newBest := math.Fmin(d[len(B)][len(A)], prevBest)
-			if newBest == prevBest && !math.Inf(newBest, 1) {
+			if newBest == prevBest && !math.IsInf(newBest, 1) {
 				return newBest
 			}
 			prevBest = newBest

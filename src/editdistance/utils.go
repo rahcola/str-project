@@ -8,6 +8,20 @@ import (
 	"bufio"
 )
 
+func IntMin(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func IntMax(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func makeMatrix(rows int, cols int) [][]float64 {
 	d := make([][]float64, rows)
 	for i := 0; i < len(d); i++ {
