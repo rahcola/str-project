@@ -2,6 +2,7 @@ package editdistance
 
 import (
 	"math"
+	"utf8"
 )
 
 func MakeBasicGenEdit(G [][]string, c []float64) (func(string, string) float64) {
@@ -14,30 +15,33 @@ func MakeBasicGenEdit(G [][]string, c []float64) (func(string, string) float64) 
 		return math.Inf(1)
 	}
 
-	minCost := func(A string, B string, d [][]float64) float64 {
-		min := math.Inf(1)
-		if len(A) > 0 && len(B) > 0 && A[len(A)-1] == B[len(B)-1] {
-			min = d[len(B)-1][len(A)-1]
-		}
-		for pi, _ := range G {
-			min = math.Fmin(min, cost(A, B, pi, d))
-		}
-		return min
-	}
+	return func(Ap string, Bp string) float64 {
+		A := utf8.NewString(Ap)
+		B := utf8.NewString(Bp)
+		d := makeMatrix(B.RuneCount()+1, A.RuneCount()+1)
 
-	return func(A string, B string) float64 {
-		d := makeMatrix(len(B)+1, len(A)+1)
-
-		for x := 0; x <= len(A); x++ {
-			for y := 0; y <= len(B); y++ {
+		for x := 0; x <= A.RuneCount(); x++ {
+			for y := 0; y <= B.RuneCount(); y++ {
 				if x == 0 && y == 0 {
 					d[y][x] = 0
 				} else {
-					d[y][x] = minCost(A[:x], B[:y], d)
+					min := math.Inf(1)
+					if x > 0 && y > 0 && A.At(x-1) == B.At(y-1) {
+						min = d[y-1][x-1]
+					}
+					for pi, _ := range G {
+						min = math.Fmin(min,
+							cost(A.Slice(0, x),
+							B.Slice(0, y),
+							pi,
+							d))
+					}
+
+					d[y][x] = min
 				}
 			}
 		}
 
-		return d[len(B)][len(A)]
+		return d[B.RuneCount()][A.RuneCount()]
 	}
 }

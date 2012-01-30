@@ -2,6 +2,7 @@ package editdistance
 
 import (
 	"math"
+	"utf8"
 )
 
 func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
@@ -10,52 +11,56 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 	Broot := MakeLinkedGoto(G[1])
 	MakeLinkedFail(Broot)
 
-	minCost := func(A string,
+	minCost := func(Ap string,
 	Astate *ACNode,
-	B string,
+	Bp string,
 	Bstate *ACNode,
 	d [][]float64) float64 {
+		A := utf8.NewString(Ap)
+		B := utf8.NewString(Bp)
 		min := math.Inf(1)
-		if len(A) > 0 && len(B) > 0 && Astate.symbol == Bstate.symbol {
-			min = d[len(B)-1][len(A)-1]
+		if A.RuneCount() > 0 && B.RuneCount() > 0 && Astate.symbol == Bstate.symbol {
+			min = d[B.RuneCount()-1][A.RuneCount()-1]
 		}
 		p := Astate.output.Intersection(Bstate.output)
 		p.ForEach(func(i int) {
-			a := len(A) - len(G[0][i])
-			b := len(B) - len(G[1][i])
+			a := A.RuneCount() - utf8.NewString(G[0][i]).RuneCount()
+			b := B.RuneCount() - utf8.NewString(G[1][i]).RuneCount()
 			min = math.Fmin(min, d[b][a]+c[i])
 		})
 		return min
 	}
 
-	return func(A string, B string) float64 {
-		d := makeMatrix(len(B)+1, len(A)+1)
+	return func(Ap string, Bp string) float64 {
+		A := utf8.NewString(Ap)
+		B := utf8.NewString(Bp)
+		d := makeMatrix(B.RuneCount()+1, A.RuneCount()+1)
 
 		Astate := Aroot
 		Bstate := Broot
 
-		for x := 0; x <= len(A); x++ {
+		for x := 0; x <= A.RuneCount(); x++ {
 			Bstate = Broot
-			for y := 0; y <= len(B); y++ {
+			for y := 0; y <= B.RuneCount(); y++ {
 				if x == 0 && y == 0 {
 					d[y][x] = 0
 				} else {
-					d[y][x] = minCost(A[:x],
+					d[y][x] = minCost(A.Slice(0, x),
 						Astate,
-						B[:y],
+						B.Slice(0, y),
 						Bstate,
 						d)
 				}
 
-				if y < len(B) {
-					Bstate = Bstate.Push(B[y])
+				if y < B.RuneCount() {
+					Bstate = Bstate.Push(B.At(y))
 				}
 			}
-			if x < len(A) {
-				Astate = Astate.Push(A[x])
+			if x < A.RuneCount() {
+				Astate = Astate.Push(A.At(x))
 			}
 		}
 
-		return d[len(B)][len(A)]
+		return d[B.RuneCount()][A.RuneCount()]
 	}
 }
