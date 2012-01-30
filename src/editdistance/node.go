@@ -47,19 +47,21 @@ func (node ACNode) isRoot() (bool) {
 }
 
 func BinarySearch(arr Children, symbol int) (*ACNode, bool) {
-	if len(arr) == 0 {
-		return nil, false
-	}
+	low := 0
+	high := len(arr) - 1
 
-	mid := len(arr) / 2
-	val := arr[mid].symbol
-	if val > symbol {
-		return BinarySearch(arr[:mid], symbol)
+	for low <= high {
+		mid := (low + high) / 2
+		val := arr[mid].symbol
+		if val > symbol {
+			high = mid - 1
+		} else	if val < symbol {
+			low = mid + 1
+		} else {
+			return arr[mid], true
+		}
 	}
-	if val < symbol {
-		return BinarySearch(arr[mid+1:], symbol)
-	}
-	return arr[mid], true
+	return nil, false
 }
 
 func (node *ACNode) AddChild(child *ACNode) {
@@ -71,7 +73,7 @@ func (node *ACNode) LookupChild(symbol int) (*ACNode, bool) {
 	child, found := BinarySearch(node.children, symbol)
 
 	if !found {
-		if node.isRoot() {
+		if node.root {
 			return node, true
 		}
 		return nil, false

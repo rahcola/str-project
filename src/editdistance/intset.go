@@ -7,14 +7,14 @@ func NewBitArray(size int) BitArray {
 	if s * 32 < size {
 		s++
 	}
-	return make([]uint32, 0, s)
+	return make(BitArray, 0, s)
 }
 
 func (a BitArray) Set(i int) BitArray {
 	for i >= len(a) * 32 {
 		a = append(a, 0)
 	}
-	a[i / 32] = a[i / 32] | (1 << uint(i % 32))
+	a[i / 32] = a[i / 32] | (1 << uint32(i % 32))
 	return a
 }
 
@@ -37,7 +37,7 @@ func (a BitArray) Union(b BitArray) BitArray {
 	if len(b) > l {
 		l = len(b)
 	}
-	r := make([]uint32, l)
+	r := make(BitArray, l)
 	for i := 0 ; i < len(r); i++ {
 		if i >= len(a) {
 			r[i] = b[i]
@@ -52,10 +52,10 @@ func (a BitArray) Union(b BitArray) BitArray {
 
 func (a BitArray) Intersection(b BitArray) BitArray {
 	l := len(a)
-	if len(b) < l {
+	if len(b) < len(a) {
 		l = len(b)
 	}
-	r := make([]uint32, l)
+	r := make(BitArray, l)
 	for i := 0; i < len(r); i++ {
 		r[i] = a[i] & b[i]
 	}

@@ -31,18 +31,20 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 					if x > 0 && y > 0 && Astate.symbol == Bstate.symbol {
 						min = d[y-1][x-1]
 					}
-					p := Astate.output.Intersection(Bstate.output)
-					index := 0
-					for i := 0; i < len(p); i++ {
-						word := p[i]
-						for k := 0; k < 32; k++ {
-							if word & 1 != 0 {
-								a := x - utf8.NewString(G[0][index]).RuneCount()
-								b := y - utf8.NewString(G[1][index]).RuneCount()
-								min = math.Fmin(min, d[b][a]+c[index])
+					if len(Astate.output) > 0 && len(Bstate.output) > 0 {
+						p := Astate.output.Intersection(Bstate.output)
+						index := 0
+						for i := 0; i < len(p); i++ {
+							word := p[i]
+							for k := 0; k < 32; k++ {
+								if word & 1 != 0 {
+									a := x - utf8.NewString(G[0][index]).RuneCount()
+									b := y - utf8.NewString(G[1][index]).RuneCount()
+									min = math.Fmin(min, d[b][a]+c[index])
+								}
+								word = word >> 1
+								index++
 							}
-							word = word >> 1
-							index++
 						}
 					}
 					d[y][x] = min
