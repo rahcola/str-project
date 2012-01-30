@@ -7,15 +7,14 @@ import (
 func MakeLinkedFail(root *ACNode) {
 	queue := list.New()
 	
-	for _, child := range *root.children {
+	for _, child := range root.children {
 		queue.PushBack(child)
-		child.(*ACNode).fail = root
+		child.fail = root
 	}
 
 	for queue.Len() > 0 {
 		r := queue.Remove(queue.Front()).(*ACNode)
-		for _, s := range *r.children {
-			s := s.(*ACNode)
+		for _, s := range r.children {
 			queue.PushBack(s)
 
 			state := r.fail
