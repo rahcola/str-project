@@ -12,16 +12,18 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 	MakeLinkedFail(Broot)
 
 	return func(Ap string, Bp string) float64 {
-		A := utf8.NewString(Ap)
-		B := utf8.NewString(Bp)
-		d := makeMatrix(B.RuneCount()+1, A.RuneCount()+1)
+		A := utf8.NewString(Ap+" ")
+		ALen := A.RuneCount()-1
+		B := utf8.NewString(Bp+" ")
+		BLen := B.RuneCount()-1
+		d := makeMatrix(BLen+1, ALen+1)
 
 		Astate := Aroot
 		Bstate := Broot
 
-		for x := 0; x <= A.RuneCount(); x++ {
+		for x := 0; x <= ALen; x++ {
 			Bstate = Broot
-			for y := 0; y <= B.RuneCount(); y++ {
+			for y := 0; y <= BLen; y++ {
 				if x == 0 && y == 0 {
 					d[y][x] = 0
 				} else {
@@ -30,23 +32,26 @@ func MakeACGenEdit(G [][]string, c []float64) func(string, string) float64 {
 						min = d[y-1][x-1]
 					}
 					p := Astate.output.Intersection(Bstate.output)
-					p.ForEach(func(i int) {
-						a := x - utf8.NewString(G[0][i]).RuneCount()
-						b := y - utf8.NewString(G[1][i]).RuneCount()
-						min = math.Fmin(min, d[b][a]+c[i])
-					})
+					index := 0
+					for i := 0; i < len(p); i++ {
+						word := p[i]
+						for k := 0; k < 32; k++ {
+							if word & 1 != 0 {
+								a := x - utf8.NewString(G[0][index]).RuneCount()
+								b := y - utf8.NewString(G[1][index]).RuneCount()
+								min = math.Fmin(min, d[b][a]+c[index])
+							}
+							word = word >> 1
+							index++
+						}
+					}
 					d[y][x] = min
 				}
-
-				if y < B.RuneCount() {
-					Bstate = Bstate.Push(B.At(y))
-				}
+				Bstate = Bstate.Push(B.At(y))
 			}
-			if x < A.RuneCount() {
-				Astate = Astate.Push(A.At(x))
-			}
+			Astate = Astate.Push(A.At(x))
 		}
 
-		return d[B.RuneCount()][A.RuneCount()]
+		return d[BLen][ALen]
 	}
 }
