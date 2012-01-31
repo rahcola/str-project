@@ -25,7 +25,7 @@ func MakeLinkedFail(root *ACNode) {
 			}
 
 			s.fail, _ = state.LookupChild(s.symbol)
-			s.output = s.output.Union(s.fail.output)
+			//s.output = s.output.Union(s.fail.output)
 		}
 	}
 }

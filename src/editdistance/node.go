@@ -42,10 +42,6 @@ func NewRootACNode(outputSize int) (*ACNode) {
 		make([]*ACNode, 0, 1)}
 }
 
-func (node ACNode) isRoot() (bool) {
-	return node.root
-}
-
 func BinarySearch(arr Children, symbol int) (*ACNode, bool) {
 	low := 0
 	high := len(arr) - 1
@@ -62,6 +58,16 @@ func BinarySearch(arr Children, symbol int) (*ACNode, bool) {
 		}
 	}
 	return nil, false
+}
+
+func (node *ACNode) Output() BitArray {
+	r := NewBitArray(0).Union(node.output)
+	v := node.fail
+	for v != nil {
+		r = r.Union(v.output)
+		v = v.fail
+	}
+	return r
 }
 
 func (node *ACNode) AddChild(child *ACNode) {
