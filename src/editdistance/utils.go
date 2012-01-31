@@ -26,12 +26,12 @@ func readLines(path string) []string {
 
 	reader := bufio.NewReader(file)
 	line, isPrefix, err := reader.ReadLine()
-	buf := make([]byte, 1024)
+	buf := make([]byte, 0, 1024)
 	for err == nil {
 		buf = append(buf, line...)
 		if !isPrefix {
 			lines = append(lines, string(buf))
-			buf = make([]byte, 1024)
+			buf = make([]byte, 0, 1024)
 		}
 		line, isPrefix, err = reader.ReadLine()
 	}
