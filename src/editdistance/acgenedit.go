@@ -6,10 +6,10 @@ import (
 )
 
 func MakeACGenEdit(Gp [][]string, c []float64) func(string, string) float64 {
-	Aroot := MakeLinkedGoto(Gp[0])
-	MakeLinkedFail(Aroot)
-	Broot := MakeLinkedGoto(Gp[1])
-	MakeLinkedFail(Broot)
+	Proot := MakeLinkedGoto(Gp[0])
+	MakeLinkedFail(Proot)
+	Troot := MakeLinkedGoto(Gp[1])
+	MakeLinkedFail(Troot)
 	G := make([][]*utf8.String, len(Gp))
 	for i, _ := range G {
 		G[i] = make([]*utf8.String, len(Gp[i]))
@@ -18,29 +18,29 @@ func MakeACGenEdit(Gp [][]string, c []float64) func(string, string) float64 {
 		}
 	}
 
-	return func(Ap string, Bp string) float64 {
-		A := utf8.NewString(Ap+" ")
-		ALen := A.RuneCount()-1
-		B := utf8.NewString(Bp+" ")
-		BLen := B.RuneCount()-1
-		d := makeMatrix(BLen+1, ALen+1)
+	return func(pattern string, text string) float64 {
+		P := utf8.NewString(pattern+" ")
+		PLen := P.RuneCount()-1
+		T := utf8.NewString(text+" ")
+		TLen := T.RuneCount()-1
+		d := makeMatrix(TLen+1, PLen+1)
 		p := NewBitArray(len(Gp[0]))
 
-		Astate := Aroot
-		Bstate := Broot
+		Pstate := Proot
+		Tstate := Troot
 
-		for x := 0; x <= ALen; x++ {
-			Bstate = Broot
-			for y := 0; y <= BLen; y++ {
+		for x := 0; x <= PLen; x++ {
+			Tstate = Troot
+			for y := 0; y <= TLen; y++ {
 				if x == 0 && y == 0 {
 					d[y][x] = 0
 				} else {
 					d[y][x] = math.Inf(1)
-					if x > 0 && y > 0 && Astate.symbol == Bstate.symbol {
+					if x > 0 && y > 0 && Pstate.symbol == Tstate.symbol {
 						d[y][x] = d[y-1][x-1]
 					}
-					if len(Astate.output) > 0 && len(Bstate.output) > 0 {
-						p = p.Intersection(Astate.output, Bstate.output)
+					if len(Pstate.output) > 0 && len(Tstate.output) > 0 {
+						p = p.Intersection(Pstate.output, Tstate.output)
 						p.ForEach(func (i int) {
 							a := x - G[0][i].RuneCount()
 							b := y - G[1][i].RuneCount()
@@ -48,11 +48,11 @@ func MakeACGenEdit(Gp [][]string, c []float64) func(string, string) float64 {
 						})
 					}
 				}
-				Bstate = Bstate.Push(B.At(y))
+				Tstate = Tstate.Push(T.At(y))
 			}
-			Astate = Astate.Push(A.At(x))
+			Pstate = Pstate.Push(P.At(x))
 		}
 
-		return d[BLen][ALen]
+		return d[TLen][PLen]
 	}
 }

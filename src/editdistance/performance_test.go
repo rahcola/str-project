@@ -6,6 +6,44 @@ import (
 
 var data []string = readLines("dna.50MB")
 
+/* DNA Inversions */
+
+func BenchmarkACDNAInversions(b *testing.B) {
+	b.StopTimer()
+	pattern := "ACTGCATCGACTGAATCGATC"
+	rules, costs := PatternRuleToListed(DNAInversionRules(pattern))
+	genedit := MakeACGenEdit(rules, costs)
+	b.ResetTimer()
+	b.StartTimer()
+	times := 1
+	for i := 0; i + len(pattern) <= len(data[0]); i++ {
+		end := i + len(pattern)
+		genedit(pattern, data[0][i:end])
+		if times > b.N {
+			break
+		}
+		times++
+	}
+}
+
+func BenchmarkBasicDNAInversions(b *testing.B) {
+	b.StopTimer()
+	pattern := "ACTGCATCGACTGAATCGATC"
+	rules, costs := PatternRuleToPaired(DNAInversionRules(pattern))
+	genedit := MakeBasicGenEdit(rules, costs)
+	b.ResetTimer()
+	b.StartTimer()
+	times := 1
+	for i := 0; i + len(pattern) <= len(data[0]); i++ {
+		end := i + len(pattern)
+		genedit(pattern, data[0][i:end])
+		if times > b.N {
+			break
+		}
+		times++
+	}
+}
+
 /* Long words */
 
 func BenchmarkBasicFewShortPatternsLongWords(b *testing.B) {

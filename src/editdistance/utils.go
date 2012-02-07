@@ -38,32 +38,78 @@ func readLines(path string) []string {
 	return lines
 }
 
+func Substrings(str string) []string {
+	s := utf8.NewString(str)
+	n := s.RuneCount()
+	substrings := make([]string, 0, (n * (n+1)) / 2)
+	for start := 0; start < n; start++ {
+		for end := start + 1; end <= n; end++ {
+			substrings = append(substrings, s.Slice(start, end))
+		}
+	}
+	return substrings
+}
+
+func Reverse(str string) string {
+	n := len(str)
+	ret := make([]int, n)
+	for _, rune := range str {
+		n--
+		ret[n] = rune
+	}
+	return string(ret[n:])
+}
+
+func DNAInversion(str string) string {
+	return strings.Map(func (rune int) int {
+		x := -1
+		switch rune {
+		case 'A': x = 'T'
+		case 'T': x = 'A'
+		case 'G': x = 'C'
+		case 'C': x = 'G'
+		}
+		return x
+	},
+		Reverse(str))
+}
+
 type PatternRule struct {
 	leftSide string
 	rightSide string
 	cost float64
 }
 
-func GenPatternRule(alpha string, min int, max int) *PatternRule {
+func RandomString(alpha string, min int, max int) string {
 	alphabet := utf8.NewString(alpha)
-
-	leftSide := make([]string, rand.Intn(max-(min-1))+min)
-	for i, _ := range leftSide {
+	runes := make([]int, rand.Intn(max-(min-1)) + min)
+	for i, _ := range runes {
 		p := rand.Intn(alphabet.RuneCount())
-		leftSide[i] = alphabet.Slice(p, p+1)
+		runes[i] = alphabet.At(p)
+	}
+	return string(runes)
+}
+
+func DNAInversionRules(pattern string) []PatternRule {
+	substrings := Substrings(pattern)
+	inversions := make([]string, len(substrings))
+	for i, s := range substrings {
+		inversions[i] = DNAInversion(s)
 	}
 
-	rightSide := make([]string, rand.Intn(max-(min-1))+min)
-	for i, _ := range rightSide {
-		p := rand.Intn(alphabet.RuneCount())
-		rightSide[i] = alphabet.Slice(p, p+1)
+	rules := make([]PatternRule, len(substrings))
+	for i, _ := range rules {
+		rules[i] = PatternRule{substrings[i], inversions[i], 0}
 	}
+	return rules
+}
 
+func GenPatternRule(alpha string, min int, max int) *PatternRule {
+	leftSide := RandomString(alpha, min, max)
+	rightSide := RandomString(alpha, min, max)
 	cost := rand.Float64() * 10
 
-	return &PatternRule{strings.Join(leftSide, ""),
-		strings.Join(rightSide, ""),
-		cost}
+	return &PatternRule{leftSide, rightSide, cost}
 }
 
 func ShortPatterns(alphabet string, min int, max int) []PatternRule {

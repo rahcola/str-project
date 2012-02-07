@@ -4,6 +4,27 @@ import (
 	"testing"
 )
 
+func TestInversion(t *testing.T) {
+	dna := "ACTG"
+	if DNAInversion(dna) != "CAGT" {
+		t.Error("Expected ACTG, got", DNAInversion(dna))
+	}
+}
+
+func TestInversions(t *testing.T) {
+	dna := "ACTG"
+	substrings := Substrings(dna)
+	inversions := []string{"T", "GT", "AGT", "CAGT",
+		"G", "AG", "CAG",
+		"A", "CA",
+		"C"}
+	for i, s := range substrings {
+		if DNAInversion(s) != inversions[i] {
+			t.Error("Got", DNAInversion(s), "expected", inversions[i])
+		}
+	}
+}
+
 func TestZero(t *testing.T) {
 	root := MakeLinkedGoto([]string{"she", "he", "his", "hers"})
 	MakeLinkedFail(root)
