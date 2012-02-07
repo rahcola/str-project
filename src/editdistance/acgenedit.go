@@ -24,6 +24,7 @@ func MakeACGenEdit(Gp [][]string, c []float64) func(string, string) float64 {
 		B := utf8.NewString(Bp+" ")
 		BLen := B.RuneCount()-1
 		d := makeMatrix(BLen+1, ALen+1)
+		p := NewBitArray(len(Gp[0]))
 
 		Astate := Aroot
 		Bstate := Broot
@@ -39,7 +40,7 @@ func MakeACGenEdit(Gp [][]string, c []float64) func(string, string) float64 {
 						d[y][x] = d[y-1][x-1]
 					}
 					if len(Astate.output) > 0 && len(Bstate.output) > 0 {
-						p := Astate.output.Intersection(Bstate.output)
+						p = p.Intersection(Astate.output, Bstate.output)
 						p.ForEach(func (i int) {
 							a := x - G[0][i].RuneCount()
 							b := y - G[1][i].RuneCount()

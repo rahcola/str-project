@@ -50,12 +50,12 @@ func (a BitArray) Union(b BitArray) BitArray {
 	return r
 }
 
-func (a BitArray) Intersection(b BitArray) BitArray {
+func (r BitArray) Intersection(a BitArray, b BitArray) BitArray {
 	l := len(a)
 	if len(b) < len(a) {
 		l = len(b)
 	}
-	r := make(BitArray, l)
+	r = r[:l]
 	for i := 0; i < len(r); i++ {
 		r[i] = a[i] & b[i]
 	}

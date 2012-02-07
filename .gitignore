@@ -8,3 +8,5 @@ _test
 *.out
 *.6
 _testmain.go
+
+*.pdf
